@@ -1,0 +1,6 @@
+[package]
+name = "rustcast"
+version = "0.1.0"
+authors = ["Yuval Adam <_@yuv.al>"]
+
+[dependencies]
