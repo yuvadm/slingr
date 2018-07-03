@@ -13,10 +13,9 @@ fn main() {
         .author("Yuval Adam")
         .about("A simple UPnP/DLNA casting player")
         .arg(Arg::with_name("file")
-            .short("f")
-            .long("file")
             .value_name("FILE")
             .help("Media file to stream")
+            .index(1)
             .required(true))
         .get_matches();
     //println!("\n{}", "Rustcast v0.1.0".color("blue").bold());
