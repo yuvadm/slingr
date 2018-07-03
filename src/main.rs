@@ -1,8 +1,11 @@
 extern crate clap;
 extern crate colored;
+extern crate rustyline;
 
 use colored::*;
 use clap::{Arg, App, SubCommand};
+use rustyline::error::ReadlineError;
+use rustyline::Editor;
 
 fn main() {
     let matches = App::new("Rustcast")
