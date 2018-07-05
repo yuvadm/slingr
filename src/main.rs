@@ -1,5 +1,7 @@
 extern crate clap;
+extern crate colored;
 
+use colored::*;
 use clap::{Arg, App};
 use std::path::Path;
 use std::process;
