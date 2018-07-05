@@ -4,6 +4,5 @@ version = "0.1.0"
 authors = ["Yuval Adam <_@yuv.al>"]
 
 [dependencies]
-colored = "1.6"
 clap = "2.32"
 termios = "0.3.0"

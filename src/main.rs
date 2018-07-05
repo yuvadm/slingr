@@ -1,31 +1,10 @@
 extern crate clap;
-extern crate colored;
-extern crate termios;
 
-use colored::*;
 use clap::{Arg, App};
 use std::path::Path;
 use std::process;
 
-use std::io;
-use std::io::{Read, Write};
-use termios::{Termios, TCSANOW, ECHO, ICANON, tcsetattr};
-
-fn read_char() {
-    let stdin = 0;
-    let termios = Termios::from_fd(stdin).unwrap();
-    let mut new_termios = termios.clone();  // make a mutable copy of termios that we will modify
-    new_termios.c_lflag &= !(ICANON | ECHO);  // no echo and canonical mode
-    tcsetattr(stdin, TCSANOW, &mut new_termios).unwrap();
-    let stdout = io::stdout();
-    let mut reader = io::stdin();
-    let mut buffer = [0;1];  // read exactly one byte
-    print!("Hit a key! ");
-    stdout.lock().flush().unwrap();
-    reader.read_exact(&mut buffer).unwrap();
-    println!("You have hit: {:?}", buffer);
-    tcsetattr(stdin, TCSANOW, & termios).unwrap();  // reset the stdin to original termios data
-}
+mod cli;
 
 fn main() {
     let app = App::new("Rustcast")
@@ -49,5 +28,6 @@ fn main() {
         process::exit(1);
     }
 
-    read_char();
+    // test a single char read
+    cli::read_char();
 }
