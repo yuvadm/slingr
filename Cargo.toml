@@ -6,4 +6,3 @@ authors = ["Yuval Adam <_@yuv.al>"]
 [dependencies]
 colored = "1.6"
 clap = "2.32"
-rustyline = "1.0.0"
