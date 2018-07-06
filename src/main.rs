@@ -7,6 +7,7 @@ use std::path::Path;
 use std::process;
 
 mod cli;
+mod upnp;
 
 fn main() {
     let app = App::new("Rustcast")
@@ -31,5 +32,6 @@ fn main() {
     }
 
     // test a single char read
-    cli::read_char();
+    // cli::read_char();
+    upnp::discover();
 }
