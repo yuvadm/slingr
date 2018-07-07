@@ -7,11 +7,10 @@ use std::path::Path;
 use std::process;
 
 mod cli;
-mod upnp;
 
 fn main() {
-    let app = App::new("Rustcast")
-        .version("0.1")
+    let app = App::new(env!("CARGO_PKG_NAME"))
+        .version(env!("CARGO_PKG_VERSION"))
         .author("Yuval Adam")
         .about("A simple UPnP/DLNA casting player")
         .arg(Arg::with_name("FILE")
