@@ -10,6 +10,5 @@ User-Agent: rustcast/0.1.0\r\n\r\n";
 pub fn discover() {
     println!("Discovering...");
     let socket = UdpSocket::bind("[::]:0").unwrap();
-    socket.connect("239.255.255.250:1900").unwrap();
     socket.send_to(SEARCH_REQUEST.as_bytes(), "239.255.255.250:1900").expect("couldn't send data");
 }
