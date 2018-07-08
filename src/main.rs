@@ -5,6 +5,8 @@ use colored::*;
 use clap::{Arg, App};
 use std::path::Path;
 use std::process;
+use std::thread;
+use std::sync::mpsc;
 
 mod cli;
 
@@ -30,6 +32,26 @@ fn main() {
         process::exit(1);
     }
 
-    // test a single char read
-    cli::read_char();
+    let (tx, rx) = mpsc::channel();
+
+    let child = thread::spawn(move || {
+        let mut controller = cli::Controller::init();
+        loop {
+            let c = controller.read();
+            tx.send(c).unwrap();
+            if c == 113 {
+                break;
+            }
+        }
+        controller.destroy();
+    });
+
+    for received in rx {
+        println!("Got char: {}", received);
+    }
+
+    println!("Waiting for all thread");
+    let _res = child.join();
+    println!("Done!");
+
 }

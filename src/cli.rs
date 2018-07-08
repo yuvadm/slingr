@@ -1,21 +1,47 @@
 extern crate termios;
 
 use std::io;
-use std::io::{Read, Write};
+use std::io::{Stdout, Stdin, Read, Write};
 use self::termios::{Termios, TCSANOW, ECHO, ICANON, tcsetattr};
 
-pub fn read_char() {
-    let stdin = 0;
-    let termios = Termios::from_fd(stdin).unwrap();
-    let mut new_termios = termios.clone();  // make a mutable copy of termios that we will modify
-    new_termios.c_lflag &= !(ICANON | ECHO);  // no echo and canonical mode
-    tcsetattr(stdin, TCSANOW, &mut new_termios).unwrap();
-    let stdout = io::stdout();
-    let mut reader = io::stdin();
-    let mut buffer = [0;1];  // read exactly one byte
-    print!("Hit a key! ");
-    stdout.lock().flush().unwrap();
-    reader.read_exact(&mut buffer).unwrap();
-    println!("You have hit: {:?}", buffer);
-    tcsetattr(stdin, TCSANOW, & termios).unwrap();  // reset the stdin to original termios data
+pub struct Controller {
+    termios: Termios,
+    new_termios: Termios,
+    stdin: i32,
+    stdout: Stdout,
+    reader: Stdin,
+    buffer: [u8; 1]
+}
+
+impl Controller {
+    pub fn init() -> Controller {
+        let stdin = 0;
+        let termios = Termios::from_fd(stdin).unwrap();
+        let mut new_termios = termios.clone();  // make a mutable copy of termios that we will modify
+        new_termios.c_lflag &= !(ICANON | ECHO);  // no echo and canonical mode
+        tcsetattr(stdin, TCSANOW, &mut new_termios).unwrap();
+        let stdout = io::stdout();
+        let reader = io::stdin();
+        let buffer = [0; 1];
+        Controller {
+            termios: termios,
+            new_termios: new_termios,
+            stdin: stdin,
+            stdout: stdout,
+            reader: reader,
+            buffer: buffer
+        }
+    }
+
+    pub fn read(&mut self) -> u8 {
+        print!("Hit a key! ");
+        self.stdout.lock().flush().unwrap();
+        self.reader.read_exact(&mut self.buffer).unwrap();
+        println!("You have hit: {:?}", self.buffer);
+        self.buffer[0]
+    }
+
+    pub fn destroy(&self) {
+        tcsetattr(self.stdin, TCSANOW, & self.termios).unwrap();  // reset the stdin to original termios data
+    }
 }
