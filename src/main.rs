@@ -31,6 +31,5 @@ fn main() {
     }
 
     // test a single char read
-    // cli::read_char();
-    upnp::discover();
+    cli::read_char();
 }
