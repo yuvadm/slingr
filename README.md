@@ -1,6 +1,7 @@
 # Slingr
 
 [![Build Status](https://travis-ci.org/yuvadm/slingr.svg?branch=master)](https://travis-ci.org/yuvadm/slingr)
+[![Crates.io](https://img.shields.io/crates/v/slingr.svg)](https://crates.io/crates/slingr)
 
 A simple CLI for streaming media files over a local network to UPnP media renderers.
 
