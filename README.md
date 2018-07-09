@@ -1,4 +1,4 @@
-# Rustcast
+# Slingr
 
 A simple UPnP/DLNA casting player.
 
