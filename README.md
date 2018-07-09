@@ -1,6 +1,10 @@
 # Slingr
 
-A simple command line tool for streaming media files over a local network to a a UPnP media renderer (e.g. HDMI/DLNA/UPnP/Miracast Dongles).
+[![Build Status](https://travis-ci.org/yuvadm/slingr.svg?branch=master)](https://travis-ci.org/yuvadm/slingr)
+
+A simple CLI for streaming media files over a local network to UPnP media renderers.
+
+Designed to work with cheap HDMI/DLNA/UPnP/Miracast Dongles.
 
 The `r` stands for Rust.
 

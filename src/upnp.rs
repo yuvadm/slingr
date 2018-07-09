@@ -5,7 +5,7 @@ Host: 239.255.255.250:1900\r\n
 Man: \"ssdp:discover\"\r\n
 ST: ssdp:all\r\n
 MX: 3\r\n
-User-Agent: rustcast/0.1.0\r\n\r\n";
+User-Agent: slingr/0.1.0\r\n\r\n";
 
 pub fn discover() {
     println!("Discovering...");
