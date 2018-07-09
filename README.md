@@ -31,6 +31,12 @@ To target a specific device:
 $ slingr --device 192.168.33.44 ~/path/to/media.file
 ```
 
+To add subtitles to the playback:
+
+```bash
+$ slingr --subtitles ~/path/to/subtitles.file ~/path/to/media.file
+```
+
 ### Controls
 
 During playback use the following controls:
