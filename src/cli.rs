@@ -6,7 +6,6 @@ use self::termios::{Termios, TCSANOW, ECHO, ICANON, tcsetattr};
 
 pub struct Controller {
     termios: Termios,
-    new_termios: Termios,
     stdin: i32,
     stdout: Stdout,
     reader: Stdin,
@@ -17,19 +16,21 @@ impl Controller {
     pub fn init() -> Controller {
         let stdin = 0;
         let termios = Termios::from_fd(stdin).unwrap();
-        let mut new_termios = termios.clone();  // make a mutable copy of termios that we will modify
-        new_termios.c_lflag &= !(ICANON | ECHO);  // no echo and canonical mode
-        tcsetattr(stdin, TCSANOW, &mut new_termios).unwrap();
+
+        // make a mutable copy of termios, and drop echo and canonical mode
+        let mut new_termios = termios;
+        new_termios.c_lflag &= !(ICANON | ECHO);
+
+        tcsetattr(stdin, TCSANOW, &new_termios).unwrap();
         let stdout = io::stdout();
         let reader = io::stdin();
         let buffer = [0; 1];
         Controller {
-            termios: termios,
-            new_termios: new_termios,
-            stdin: stdin,
-            stdout: stdout,
-            reader: reader,
-            buffer: buffer
+            termios,
+            stdin,
+            stdout,
+            reader,
+            buffer
         }
     }
 
