@@ -5,7 +5,7 @@ authors = ["Yuval Adam <_@yuv.al>"]
 description = "A simple CLI for UPnP media file streaming"
 homepage = "https://github.com/yuvadm/slingr"
 repository = "https://github.com/yuvadm/slingr"
-license = "GPLv3"
+license = "GPL-3.0"
 
 [dependencies]
 colored = "1.6"
