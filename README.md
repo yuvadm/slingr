@@ -17,6 +17,27 @@ The `r` stands for Rust.
  - [ ] Add subtitles to the video
  - [ ] Integrate with ffmpeg to do on the fly transcoding
 
+## Usage
+
+Make sure you have a UPnP streamer online on your local network, then run:
+
+```bash
+$ slingr ~/path/to/media.file
+```
+
+To target a specific device:
+
+```bash
+$ slingr --device 192.168.33.44 ~/path/to/media.file
+```
+
+### Controls
+
+During playback use the following controls:
+
+ - <kbd>Space</kbd> - Play / Pause
+ - <kbd>q</kbd> - Quit
+
 ## License
 
 [GPLv3](LICENSE)
