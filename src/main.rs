@@ -14,7 +14,7 @@ fn main() {
     let app = App::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
         .author("Yuval Adam")
-        .about("A simple UPnP/DLNA casting player")
+        .about(env!("CARGO_PKG_DESCRIPTION"))
         .arg(Arg::with_name("device")
              .short("d")
              .long("device")
