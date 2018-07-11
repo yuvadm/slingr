@@ -10,4 +10,6 @@ license = "GPL-3.0"
 [dependencies]
 colored = "1.6"
 clap = "2.32"
+indoc = "0.2"
+regex = "1"
 termios = "0.3.0"

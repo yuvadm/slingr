@@ -1,3 +1,7 @@
+#[cfg(test)]
+#[macro_use]
+extern crate indoc;
+
 extern crate clap;
 extern crate colored;
 
