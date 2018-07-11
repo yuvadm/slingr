@@ -9,6 +9,7 @@ use std::thread;
 use std::sync::mpsc;
 
 mod cli;
+mod upnp;
 
 fn main() {
     let app = App::new(env!("CARGO_PKG_NAME"))
@@ -42,8 +43,11 @@ fn main() {
         process::exit(1);
     }
 
-    let (tx, rx) = mpsc::channel();
+    let _udp = thread::spawn(move || {
+        upnp::discover();
+    });
 
+    let (tx, rx) = mpsc::channel();
     let child = thread::spawn(move || {
         let mut controller = cli::Controller::init();
         loop {
