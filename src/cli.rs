@@ -35,10 +35,8 @@ impl Controller {
     }
 
     pub fn read(&mut self) -> u8 {
-        print!("Hit a key! ");
         self.stdout.lock().flush().unwrap();
         self.reader.read_exact(&mut self.buffer).unwrap();
-        println!("You have hit: {:?}", self.buffer);
         self.buffer[0]
     }
 

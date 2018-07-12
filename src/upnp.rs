@@ -1,9 +1,14 @@
+extern crate hyper;
 extern crate regex;
 
 use self::regex::Regex;
+use self::hyper::Client;
+use self::hyper::rt::{self, Future, Stream};
 use std::collections::HashMap;
 use std::net::UdpSocket;
 use std::str;
+use std::io::{self, Write};
+
 
 
 const MULTICAST_ADDRESS: &'static str = "239.255.255.250:1900";
@@ -20,13 +25,14 @@ User-Agent: slingr/0.1.0\r\n\r\n";
 //     CONNECTION_MANAGER
 // }
 
+#[derive(Debug)]
 pub struct Device {
     usn: String,
     xml: String,
 }
 
 const USN_REGEX: &'static str = r"uuid:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})";
-const XML_REGEX: &'static str = r"Location: (http(s?)://.*)";
+const XML_REGEX: &'static str = r"Location: (http(s?)://[\w\.:/]*)";
 
 fn parse_udp_message(msg: &str) -> Device {
     let usn_re = Regex::new(USN_REGEX).unwrap();
@@ -37,6 +43,35 @@ fn parse_udp_message(msg: &str) -> Device {
         usn,
         xml
     }
+}
+
+fn fetch_url(url: hyper::Uri) -> impl Future<Item=(), Error=()> {
+    let client = Client::new();
+
+    client
+        // Fetch the url...
+        .get(url)
+        // And then, if we get a response back...
+        .and_then(|res| {
+            println!("Response: {}", res.status());
+            println!("Headers: {:#?}", res.headers());
+
+            // The body is a stream, and for_each returns a new Future
+            // when the stream is finished, and calls the closure on
+            // each chunk of the body...
+            res.into_body().for_each(|chunk| {
+                io::stdout().write_all(&chunk)
+                    .map_err(|e| panic!("example expects stdout is open, error={}", e))
+            })
+        })
+        // If all good, just tell the user...
+        .map(|_| {
+            println!("\n\nDone.");
+        })
+        // If there was an error, let the user know...
+        .map_err(|err| {
+            eprintln!("Error {}", err);
+        })
 }
 
 pub fn discover() {
@@ -53,8 +88,10 @@ pub fn discover() {
         let (amt, _src) = socket.recv_from(&mut buf).expect("Didn't receive data...");
         let filled_buf = &mut buf[..amt];
         let s = str::from_utf8(filled_buf).unwrap();
-        let _d = parse_udp_message(s);
-        println!("Got: {}\n\n", s);
+        let d = parse_udp_message(s);
+        println!("Got: {:?}\n\n", d);
+        rt::run(fetch_url(d.xml.parse::<hyper::Uri>().unwrap()));
+        break;
     }
 }
 
