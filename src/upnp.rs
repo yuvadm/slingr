@@ -63,7 +63,7 @@ mod tests {
     use upnp::*;
 
     #[test]
-    fn exploration() {
+    fn test_parsing() {
         let msg = indoc!(r#"
             HTTP/1.1 200 OK
             Content-Type: text/xml; charset="utf-8"
