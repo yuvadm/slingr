@@ -14,6 +14,7 @@ use std::sync::mpsc;
 
 mod cli;
 mod upnp;
+mod serve;
 
 fn main() {
     let app = App::new(env!("CARGO_PKG_NAME"))
@@ -47,29 +48,31 @@ fn main() {
         process::exit(1);
     }
 
-    let _udp = thread::spawn(move || {
-        upnp::discover();
-    });
+    serve::run();
 
-    let (tx, rx) = mpsc::channel();
-    let child = thread::spawn(move || {
-        let mut controller = cli::Controller::init();
-        loop {
-            let c = controller.read();
-            tx.send(c).unwrap();
-            if c == 113 {
-                break;
-            }
-        }
-        controller.destroy();
-    });
+    // let _udp = thread::spawn(move || {
+    //     upnp::discover();
+    // });
 
-    for received in rx {
-        println!("Got char: {}", received);
-    }
+    // let (tx, rx) = mpsc::channel();
+    // let child = thread::spawn(move || {
+    //     let mut controller = cli::Controller::init();
+    //     loop {
+    //         let c = controller.read();
+    //         tx.send(c).unwrap();
+    //         if c == 113 {
+    //             break;
+    //         }
+    //     }
+    //     controller.destroy();
+    // });
 
-    println!("Waiting for all thread");
-    let _res = child.join();
-    println!("Done!");
+    // for received in rx {
+    //     println!("Got char: {}", received);
+    // }
+
+    // println!("Waiting for all thread");
+    // let _res = child.join();
+    // println!("Done!");
 
 }
