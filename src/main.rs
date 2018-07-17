@@ -5,6 +5,10 @@ extern crate indoc;
 extern crate clap;
 extern crate colored;
 
+extern crate tokio;
+extern crate hyper;
+extern crate futures;
+
 use colored::*;
 use clap::{Arg, App};
 use std::path::Path;
@@ -12,9 +16,15 @@ use std::process;
 use std::thread;
 use std::sync::mpsc;
 
+use hyper::Server;
+use hyper::service::service_fn;
+use tokio::runtime::Runtime;
+use futures::Future;
+
 mod cli;
 mod upnp;
 mod serve;
+mod notify;
 
 fn main() {
     let app = App::new(env!("CARGO_PKG_NAME"))
@@ -48,14 +58,20 @@ fn main() {
         process::exit(1);
     }
 
+    let addr = "0.0.0.0:51497".parse().unwrap();
 
-    let _http = thread::spawn(move || {
-        serve::run();
-    });
+    let server = Server::bind(&addr)
+        .serve(|| service_fn(serve::response_examples))
+        .map_err(|e| eprintln!("server error: {}", e));
 
-    let _udp = thread::spawn(move || {
-        upnp::discover();
-    });
+    println!("Listening on http://{}", addr);
+
+    let mut rt = Runtime::new().unwrap();
+    rt.spawn(server);
+
+    // let _udp = thread::spawn(move || {
+    //     upnp::discover();
+    // });
 
     let (tx, rx) = mpsc::channel();
     let child = thread::spawn(move || {

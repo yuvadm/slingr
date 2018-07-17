@@ -25,7 +25,7 @@ pub fn run() {
 
 type ResponseFuture = Box<Future<Item=Response<Body>, Error=io::Error> + Send>;
 
-fn response_examples(req: Request<Body>) -> ResponseFuture {
+pub fn response_examples(req: Request<Body>) -> ResponseFuture {
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/0") => {
             simple_file_send("/home/yuval/Videos/0")
