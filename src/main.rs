@@ -80,13 +80,13 @@ fn main() {
         .body(Body::from(notify::BODY_SET_URI))
         .unwrap();
 
-    let req2 = Request::builder()
-        .method("POST")
-        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
-        .header("Content-Type", "text/xml")
-        .header("SOAPACTION", notify::A_PLAY)
-        .body(Body::from(notify::BODY_PLAY))
-        .unwrap();
+    // let req2 = Request::builder()
+    //     .method("POST")
+    //     .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
+    //     .header("Content-Type", "text/xml")
+    //     .header("SOAPACTION", notify::A_STOP)
+    //     .body(Body::from(notify::BODY_STOP))
+    //     .unwrap();
 
     let f = client
         .request(req1)
@@ -95,14 +95,14 @@ fn main() {
         })
         .map_err(|err| {
             println!("Something bad happened");
-        })
-        .and_then(move |_| {
-            client.request(req2).map(|res| {
-                println!("OK");
-            }).map_err(|err| {
-                println!("Something bad2");
-            })
         });
+        // .and_then(move |_| {
+        //     client.request(req2).map(|res| {
+        //         println!("OK");
+        //     }).map_err(|err| {
+        //         println!("Something bad2");
+        //     })
+        // });
 
 
     rt.spawn(f);
@@ -119,6 +119,21 @@ fn main() {
             tx.send(c).unwrap();
             if c == 113 {
                 break;
+            }
+            if c == 32 {
+                let req2 = Request::builder()
+                    .method("POST")
+                    .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
+                    .header("Content-Type", "text/xml")
+                    .header("SOAPACTION", notify::A_PLAY)
+                    .body(Body::from(notify::BODY_PLAY))
+                    .unwrap();
+                let f = client.request(req2).map(|res| {
+                    println!("OK");
+                }).map_err(|err| {
+                    println!("Err");
+                });
+                rt.spawn(f);
             }
         }
         controller.destroy();

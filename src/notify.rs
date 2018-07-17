@@ -15,8 +15,7 @@ pub const BODY_SET_URI: &'static str = r#"<?xml version='1.0' encoding='utf-8'?>
     </s:Body>
 </s:Envelope>"#;
 
-pub const BODY_PLAY: &'static str = r#"
-<?xml version='1.0' encoding='utf-8'?>
+pub const BODY_PLAY: &'static str = r#"<?xml version='1.0' encoding='utf-8'?>
 <s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
     <s:Body>
         <u:Play xmlns:u="urn:schemas-upnp-org:service:AVTransport:1">
@@ -26,8 +25,7 @@ pub const BODY_PLAY: &'static str = r#"
     </s:Body>
 </s:Envelope>"#;
 
-const BODY_STOP: &'static str = r#"
-<?xml version='1.0' encoding='utf-8'?>
+pub const BODY_STOP: &'static str = r#"<?xml version='1.0' encoding='utf-8'?>
 <s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
     <s:Body>
         <u:Stop xmlns:u="urn:schemas-upnp-org:service:AVTransport:1">
@@ -39,3 +37,4 @@ const BODY_STOP: &'static str = r#"
 
 pub const A_SET: &'static str = "urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI";
 pub const A_PLAY: &'static str = "urn:schemas-upnp-org:service:AVTransport:1#Play";
+pub const A_STOP: &'static str = "urn:schemas-upnp-org:service:AVTransport:1#Stop";
