@@ -54,16 +54,18 @@ pub const A_PLAY: &'static str = "urn:schemas-upnp-org:service:AVTransport:1#Pla
 pub const A_STOP: &'static str = "urn:schemas-upnp-org:service:AVTransport:1#Stop";
 pub const A_PAUSE: &'static str = "urn:schemas-upnp-org:service:AVTransport:1#Pause";
 
-
-pub fn set_uri(rt: &mut Runtime) {
-    let req = Request::builder()
+fn build_request(action: &'static str, body: &'static str) -> Request<Body> {
+    Request::builder()
         .method("POST")
         .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
         .header("Content-Type", "text/xml")
-        .header("SOAPACTION", A_SET)
-        .body(Body::from(BODY_SET_URI))
-        .unwrap();
+        .header("SOAPACTION", action)
+        .body(Body::from(body))
+        .unwrap()
+}
 
+pub fn set_uri(rt: &mut Runtime) {
+    let req = build_request(A_SET, BODY_SET_URI);
     let client = Client::new();
     let f = client
         .request(req)
@@ -78,14 +80,7 @@ pub fn set_uri(rt: &mut Runtime) {
 }
 
 pub fn play(rt: &mut Runtime) {
-    let req = Request::builder()
-        .method("POST")
-        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
-        .header("Content-Type", "text/xml")
-        .header("SOAPACTION", A_PLAY)
-        .body(Body::from(BODY_PLAY))
-        .unwrap();
-
+    let req = build_request(A_PLAY, BODY_PLAY);
     let client = Client::new();
     let f = client
         .request(req)
@@ -100,14 +95,7 @@ pub fn play(rt: &mut Runtime) {
 }
 
 pub fn pause(rt: &mut Runtime) {
-    let req = Request::builder()
-        .method("POST")
-        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
-        .header("Content-Type", "text/xml")
-        .header("SOAPACTION", A_PAUSE)
-        .body(Body::from(BODY_PAUSE))
-        .unwrap();
-
+    let req = build_request(A_PAUSE, BODY_PAUSE);
     let client = Client::new();
     let f = client
         .request(req)
@@ -122,14 +110,7 @@ pub fn pause(rt: &mut Runtime) {
 }
 
 pub fn stop(rt: &mut Runtime) {
-    let req = Request::builder()
-        .method("POST")
-        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
-        .header("Content-Type", "text/xml")
-        .header("SOAPACTION", A_STOP)
-        .body(Body::from(BODY_STOP))
-        .unwrap();
-
+    let req = build_request(A_STOP, BODY_STOP);
     let client = Client::new();
     let f = client
         .request(req)
