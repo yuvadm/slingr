@@ -4,10 +4,9 @@ extern crate indoc;
 
 extern crate clap;
 extern crate colored;
-
-extern crate tokio;
-extern crate hyper;
 extern crate futures;
+extern crate hyper;
+extern crate tokio;
 
 use colored::*;
 use clap::{Arg, App};
@@ -16,7 +15,6 @@ use std::process;
 use std::thread;
 use std::sync::mpsc;
 
-use hyper::{Client, Request};
 use hyper::body::Body;
 use tokio::runtime::Runtime;
 use futures::Future;
@@ -62,31 +60,13 @@ fn main() {
 
     serve::run(&mut rt);
 
-    let client = Client::new();
-    let req1 = Request::builder()
-        .method("POST")
-        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
-        .header("Content-Type", "text/xml")
-        .header("SOAPACTION", notify::A_SET)
-        .body(Body::from(notify::BODY_SET_URI))
-        .unwrap();
-
-    let f = client
-        .request(req1)
-        .map(|_res| {
-            println!("OK")
-        })
-        .map_err(|_err| {
-            println!("Something bad happened");
-        });
-
-    rt.spawn(f);
+    notify::set_uri(&mut rt);
 
     // let _udp = thread::spawn(move || {
     //     upnp::discover();
     // });
 
-    let playing = true;
+    let mut playing = false;
 
     let (tx, rx) = mpsc::channel();
     let child = thread::spawn(move || {
@@ -95,38 +75,17 @@ fn main() {
             let c = controller.read();
             tx.send(c).unwrap();
             if c == 113 {
+                notify::stop(&mut rt);
                 break;
             }
             if c == 32 {
-                let req2 = if playing {
-                    Request::builder()
-                        .method("POST")
-                        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
-                        .header("Content-Type", "text/xml")
-                        .header("SOAPACTION", notify::A_STOP)
-                        .body(Body::from(notify::BODY_STOP))
-                        .unwrap()
+                if playing {
+                    notify::pause(&mut rt);
                 }
                 else {
-                    Request::builder()
-                        .method("POST")
-                        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
-                        .header("Content-Type", "text/xml")
-                        .header("SOAPACTION", notify::A_PLAY)
-                        .body(Body::from(notify::BODY_PLAY))
-                        .unwrap()
-                };
-
-                let f = client
-                    .request(req2)
-                    .map(|_res| {
-                        println!("OK");
-                    })
-                    .map_err(|_err| {
-                        println!("Err");
-                    });
-
-                rt.spawn(f);
+                    notify::play(&mut rt);
+                }
+                playing = !playing;
             }
         }
         controller.destroy();

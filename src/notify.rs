@@ -1,3 +1,8 @@
+use hyper::{Client, Request};
+use hyper::body::Body;
+use tokio::runtime::Runtime;
+use futures::Future;
+
 const SOAP_ACTION_PREFIX: &'static str = "urn:schemas-upnp-org:service:AVTransport:1#";
 const ACTION_SET_URI: &'static str = "SetAVTransportURI";
 const ACTION_PLAY: &'static str = "Play";
@@ -25,6 +30,15 @@ pub const BODY_PLAY: &'static str = r#"<?xml version='1.0' encoding='utf-8'?>
     </s:Body>
 </s:Envelope>"#;
 
+pub const BODY_PAUSE: &'static str = r#"<?xml version='1.0' encoding='utf-8'?>
+<s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+    <s:Body>
+        <u:Pause xmlns:u="urn:schemas-upnp-org:service:AVTransport:1">
+            <InstanceID>0</InstanceID>
+        </u:Pause>
+    </s:Body>
+</s:Envelope>"#;
+
 pub const BODY_STOP: &'static str = r#"<?xml version='1.0' encoding='utf-8'?>
 <s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
     <s:Body>
@@ -38,3 +52,93 @@ pub const BODY_STOP: &'static str = r#"<?xml version='1.0' encoding='utf-8'?>
 pub const A_SET: &'static str = "urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI";
 pub const A_PLAY: &'static str = "urn:schemas-upnp-org:service:AVTransport:1#Play";
 pub const A_STOP: &'static str = "urn:schemas-upnp-org:service:AVTransport:1#Stop";
+pub const A_PAUSE: &'static str = "urn:schemas-upnp-org:service:AVTransport:1#Pause";
+
+
+pub fn set_uri(rt: &mut Runtime) {
+    let req = Request::builder()
+        .method("POST")
+        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
+        .header("Content-Type", "text/xml")
+        .header("SOAPACTION", A_SET)
+        .body(Body::from(BODY_SET_URI))
+        .unwrap();
+
+    let client = Client::new();
+    let f = client
+        .request(req)
+        .map(|_res| {
+            println!("Request good")
+        })
+        .map_err(|_err| {
+            println!("Request error");
+        });
+
+    rt.spawn(f);
+}
+
+pub fn play(rt: &mut Runtime) {
+    let req = Request::builder()
+        .method("POST")
+        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
+        .header("Content-Type", "text/xml")
+        .header("SOAPACTION", A_PLAY)
+        .body(Body::from(BODY_PLAY))
+        .unwrap();
+
+    let client = Client::new();
+    let f = client
+        .request(req)
+        .map(|_res| {
+            println!("Request good")
+        })
+        .map_err(|_err| {
+            println!("Request error");
+        });
+
+    rt.spawn(f);
+}
+
+pub fn pause(rt: &mut Runtime) {
+    let req = Request::builder()
+        .method("POST")
+        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
+        .header("Content-Type", "text/xml")
+        .header("SOAPACTION", A_PAUSE)
+        .body(Body::from(BODY_PAUSE))
+        .unwrap();
+
+    let client = Client::new();
+    let f = client
+        .request(req)
+        .map(|_res| {
+            println!("Request good")
+        })
+        .map_err(|_err| {
+            println!("Request error");
+        });
+
+    rt.spawn(f);
+}
+
+pub fn stop(rt: &mut Runtime) {
+    let req = Request::builder()
+        .method("POST")
+        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
+        .header("Content-Type", "text/xml")
+        .header("SOAPACTION", A_STOP)
+        .body(Body::from(BODY_STOP))
+        .unwrap();
+
+    let client = Client::new();
+    let f = client
+        .request(req)
+        .map(|_res| {
+            println!("Request good")
+        })
+        .map_err(|_err| {
+            println!("Request error");
+        });
+
+    rt.spawn(f);
+}
