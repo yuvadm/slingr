@@ -64,8 +64,7 @@ fn build_request(action: &'static str, body: &'static str) -> Request<Body> {
         .unwrap()
 }
 
-pub fn set_uri(rt: &mut Runtime) {
-    let req = build_request(A_SET, BODY_SET_URI);
+fn spawn_request(rt: &mut Runtime, req: Request<Body>) {
     let client = Client::new();
     let f = client
         .request(req)
@@ -75,51 +74,25 @@ pub fn set_uri(rt: &mut Runtime) {
         .map_err(|_err| {
             println!("Request error");
         });
-
     rt.spawn(f);
+}
+
+pub fn set_uri(rt: &mut Runtime) {
+    let req = build_request(A_SET, BODY_SET_URI);
+    spawn_request(rt, req);
 }
 
 pub fn play(rt: &mut Runtime) {
     let req = build_request(A_PLAY, BODY_PLAY);
-    let client = Client::new();
-    let f = client
-        .request(req)
-        .map(|_res| {
-            println!("Request good")
-        })
-        .map_err(|_err| {
-            println!("Request error");
-        });
-
-    rt.spawn(f);
+    spawn_request(rt, req);
 }
 
 pub fn pause(rt: &mut Runtime) {
     let req = build_request(A_PAUSE, BODY_PAUSE);
-    let client = Client::new();
-    let f = client
-        .request(req)
-        .map(|_res| {
-            println!("Request good")
-        })
-        .map_err(|_err| {
-            println!("Request error");
-        });
-
-    rt.spawn(f);
+    spawn_request(rt, req);
 }
 
 pub fn stop(rt: &mut Runtime) {
     let req = build_request(A_STOP, BODY_STOP);
-    let client = Client::new();
-    let f = client
-        .request(req)
-        .map(|_res| {
-            println!("Request good")
-        })
-        .map_err(|_err| {
-            println!("Request error");
-        });
-
-    rt.spawn(f);
+    spawn_request(rt, req);
 }
