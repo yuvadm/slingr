@@ -16,9 +16,8 @@ use std::process;
 use std::thread;
 use std::sync::mpsc;
 
-use hyper::{Client, Server, Request};
+use hyper::{Client, Request};
 use hyper::body::Body;
-use hyper::service::service_fn;
 use tokio::runtime::Runtime;
 use futures::Future;
 
@@ -59,19 +58,11 @@ fn main() {
         process::exit(1);
     }
 
-    let addr = "0.0.0.0:51497".parse().unwrap();
-
-    let server = Server::bind(&addr)
-        .serve(|| service_fn(serve::response_examples))
-        .map_err(|e| eprintln!("server error: {}", e));
-
-    println!("Listening on http://{}", addr);
-
     let mut rt = Runtime::new().unwrap();
-    rt.spawn(server);
+
+    serve::run(&mut rt);
 
     let client = Client::new();
-
     let req1 = Request::builder()
         .method("POST")
         .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
@@ -80,36 +71,22 @@ fn main() {
         .body(Body::from(notify::BODY_SET_URI))
         .unwrap();
 
-    // let req2 = Request::builder()
-    //     .method("POST")
-    //     .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
-    //     .header("Content-Type", "text/xml")
-    //     .header("SOAPACTION", notify::A_STOP)
-    //     .body(Body::from(notify::BODY_STOP))
-    //     .unwrap();
-
     let f = client
         .request(req1)
-        .map(|res| {
+        .map(|_res| {
             println!("OK")
         })
-        .map_err(|err| {
+        .map_err(|_err| {
             println!("Something bad happened");
         });
-        // .and_then(move |_| {
-        //     client.request(req2).map(|res| {
-        //         println!("OK");
-        //     }).map_err(|err| {
-        //         println!("Something bad2");
-        //     })
-        // });
-
 
     rt.spawn(f);
 
     // let _udp = thread::spawn(move || {
     //     upnp::discover();
     // });
+
+    let playing = true;
 
     let (tx, rx) = mpsc::channel();
     let child = thread::spawn(move || {
@@ -121,18 +98,34 @@ fn main() {
                 break;
             }
             if c == 32 {
-                let req2 = Request::builder()
-                    .method("POST")
-                    .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
-                    .header("Content-Type", "text/xml")
-                    .header("SOAPACTION", notify::A_PLAY)
-                    .body(Body::from(notify::BODY_PLAY))
-                    .unwrap();
-                let f = client.request(req2).map(|res| {
-                    println!("OK");
-                }).map_err(|err| {
-                    println!("Err");
-                });
+                let req2 = if playing {
+                    Request::builder()
+                        .method("POST")
+                        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
+                        .header("Content-Type", "text/xml")
+                        .header("SOAPACTION", notify::A_STOP)
+                        .body(Body::from(notify::BODY_STOP))
+                        .unwrap()
+                }
+                else {
+                    Request::builder()
+                        .method("POST")
+                        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
+                        .header("Content-Type", "text/xml")
+                        .header("SOAPACTION", notify::A_PLAY)
+                        .body(Body::from(notify::BODY_PLAY))
+                        .unwrap()
+                };
+
+                let f = client
+                    .request(req2)
+                    .map(|_res| {
+                        println!("OK");
+                    })
+                    .map_err(|_err| {
+                        println!("Err");
+                    });
+
                 rt.spawn(f);
             }
         }

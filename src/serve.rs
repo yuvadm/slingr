@@ -6,26 +6,26 @@ extern crate tokio_io;
 use self::futures::{future, Future};
 use self::hyper::{Body, Method, Request, Response, Server, StatusCode};
 use self::hyper::service::service_fn;
+use tokio::runtime::Runtime;
 
 use std::io;
 
 static NOTFOUND: &[u8] = b"Not Found";
 
-pub fn run() {
+pub fn run(rt: &mut Runtime) {
     let addr = "0.0.0.0:51497".parse().unwrap();
-
     let server = Server::bind(&addr)
-        .serve(|| service_fn(response_examples))
+        .serve(|| service_fn(routes))
         .map_err(|e| eprintln!("server error: {}", e));
 
-    println!("Listening on http://{}", addr);
+    rt.spawn(server);
 
-    hyper::rt::run(server);
+    println!("Listening on http://{}", addr);
 }
 
 type ResponseFuture = Box<Future<Item=Response<Body>, Error=io::Error> + Send>;
 
-pub fn response_examples(req: Request<Body>) -> ResponseFuture {
+fn routes(req: Request<Body>) -> ResponseFuture {
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/0") => {
             simple_file_send("/home/yuval/Videos/0")
