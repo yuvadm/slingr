@@ -72,7 +72,7 @@ fn main() {
 
     let client = Client::new();
 
-    let req = Request::builder()
+    let req1 = Request::builder()
         .method("POST")
         .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
         .header("Content-Type", "text/xml")
@@ -80,9 +80,7 @@ fn main() {
         .body(Body::from(notify::BODY_SET_URI))
         .unwrap();
 
-    rt.spawn(client.request(req).map(|res| {}).map_err(|err| {}));
-
-    let req = Request::builder()
+    let req2 = Request::builder()
         .method("POST")
         .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
         .header("Content-Type", "text/xml")
@@ -90,7 +88,24 @@ fn main() {
         .body(Body::from(notify::BODY_PLAY))
         .unwrap();
 
-    rt.spawn(client.request(req).map(|res| {}).map_err(|err| {}));
+    let f = client
+        .request(req1)
+        .map(|res| {
+            println!("OK")
+        })
+        .map_err(|err| {
+            println!("Something bad happened");
+        })
+        .and_then(move |_| {
+            client.request(req2).map(|res| {
+                println!("OK");
+            }).map_err(|err| {
+                println!("Something bad2");
+            })
+        });
+
+
+    rt.spawn(f);
 
     // let _udp = thread::spawn(move || {
     //     upnp::discover();
