@@ -16,7 +16,8 @@ use std::process;
 use std::thread;
 use std::sync::mpsc;
 
-use hyper::Server;
+use hyper::{Client, Server, Request};
+use hyper::body::Body;
 use hyper::service::service_fn;
 use tokio::runtime::Runtime;
 use futures::Future;
@@ -68,6 +69,28 @@ fn main() {
 
     let mut rt = Runtime::new().unwrap();
     rt.spawn(server);
+
+    let client = Client::new();
+
+    let req = Request::builder()
+        .method("POST")
+        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
+        .header("Content-Type", "text/xml")
+        .header("SOAPACTION", notify::A_SET)
+        .body(Body::from(notify::BODY_SET_URI))
+        .unwrap();
+
+    rt.spawn(client.request(req).map(|res| {}).map_err(|err| {}));
+
+    let req = Request::builder()
+        .method("POST")
+        .uri("http://10.5.1.201:38400/serviceControl/AVTransport")
+        .header("Content-Type", "text/xml")
+        .header("SOAPACTION", notify::A_PLAY)
+        .body(Body::from(notify::BODY_PLAY))
+        .unwrap();
+
+    rt.spawn(client.request(req).map(|res| {}).map_err(|err| {}));
 
     // let _udp = thread::spawn(move || {
     //     upnp::discover();
